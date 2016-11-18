@@ -7,7 +7,7 @@ import sys
 if len(sys.argv) > 1 :
 	polynomialDegree = int(sys.argv[1])
 else :
-	polynomialDegree = 4
+	polynomialDegree = 8
 N = polynomialDegree
 
 # Function to find minimax polynomial fit for, and its two first derivatives.
@@ -21,7 +21,7 @@ poly = [float(p) for p in poly]
 
 x = np.linspace(0, 1, 5000)
 chebyError = np.polyval(poly, x) - f(x)
-plt.plot(x, chebyError, 'r-')
+#plt.plot(x, chebyError, 'r-')
 plt.hold('on')
 
 # Find the zeros of the Chebyshev error.
@@ -35,7 +35,8 @@ xPoints = np.insert(xPoints, N+1, 1)
 minE = min(chebyError)
 maxE = max(chebyError)
 for i in range(polynomialDegree+2) :
-	plt.plot([xPoints[i], xPoints[i]], [minE, maxE], 'b-')
+	pass
+	#plt.plot([xPoints[i], xPoints[i]], [minE, maxE], 'b-')
 
 # Go on to find the minimax approximating polynomial using Remez's algorithm.
 def RemezAlgorithm(function, xPoints, degree) :
@@ -45,20 +46,40 @@ def RemezAlgorithm(function, xPoints, degree) :
 		for j in range(len(A[0,:])-1) :
 			A[i,j] = xPoints[i]**j
 		A[i,-1] = (-1)**(i)
-	P = np.linalg.solve(A,b)
-	return P[:-1], P[-1]
+	P 	= np.linalg.solve(A,b)
+	eps = P[-1]
+	P 	= P[:-1]
+	P 	= P[::-1]
+	return P, eps
+
+P 				= []
+eps 			= 1
+maxIterations 	= 1
+for iteration in range(maxIterations) :
+	if eps < 1e-8 :
+		print("HEI")
+		break
+	P, eps = RemezAlgorithm(f, xPoints, polynomialDegree)
+
+	dP  = np.polyder(P)
+	ddP = np.polyder(dP)
+
+	dG  = lambda x : np.polyval(dP, x)  -  df(x)
+	ddG = lambda x : np.polyval(ddP, x) - ddf(x)
+
+	for j in range(len(xPoints)) :
+		xPoints[i] = - dG(xPoints[i]) / ddG(xPoints[i])
 
 
-P, eps = RemezAlgorithm(f, xPoints, polynomialDegree)
-print(P)
+remezError  = np.polyval(P,x)
+plt.plot(x, remezError  - f(x), 'b-')
+for i in range(len(xPoints)) :
+	plt.plot([xPoints[i], xPoints[i]], [-eps, eps], 'y-*')
+
+
+
 print(eps)
-
-remezError = np.polyval(P[-1:0:-1],x)
-remezError2 = np.polyval(P,x)
-
-plt.plot(x, remezError-f(x), 'b-')
-plt.plot(x, remezError2-f(x), 'b--')
-
+print(P)
 
 
 

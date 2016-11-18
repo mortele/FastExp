@@ -7,12 +7,12 @@ import sys
 if len(sys.argv) > 1 :
 	polynomialDegree = int(sys.argv[1])
 else :
-	polynomialDegree = 8
+	polynomialDegree = 9
 N = polynomialDegree
 
 # Function to find minimax polynomial fit for, and its two first derivatives.
-f   = lambda x : 1 + x + 2**x
-df  = lambda x :  	 1 + 2**x * np.log(2)
+f   = lambda x : 1 + x - 2**x
+df  = lambda x :  	 1 - 2**x * np.log(2)
 ddf = lambda x : 		 2**x * np.log(2)**2
 
 # Start out with a Chebyshev approximation.
@@ -77,9 +77,11 @@ for i in range(len(xPoints)) :
 	plt.plot([xPoints[i], xPoints[i]], [-eps, eps], 'y-*')
 
 
+L = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N"]
+P = P[::-1]
+for i in range(len(P)) :
+	print("#define COEFF_P"+str(N)+"_"+str(L[i])+" "+str(P[i]))
 
-print(eps)
-print(P)
 
 
 
